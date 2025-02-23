@@ -33,7 +33,6 @@ class UploaderPro(loader.Module):
         self._db = db
 
     async def _get_latest_version(self):
-        """Получает последнюю версию с GitHub."""
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get('https://raw.githubusercontent.com/psyhoKuznetsov/Hikka-Models/refs/heads/main/UploaderPro.py') as response:
@@ -48,7 +47,6 @@ class UploaderPro(loader.Module):
 
     @loader.unrestricted
     async def updateprocmd(self, message: Message):
-        """Проверить обновления модуля."""
         await utils.answer(message, self.strings["update_check"])
         
         current_version = __version__
@@ -66,7 +64,6 @@ class UploaderPro(loader.Module):
             await utils.answer(message, self.strings["no_update"])
 
     async def _get_file(self, message: Message):
-        """Получает файл из сообщения."""
         reply = await message.get_reply_message()
         if not reply or not reply.media:
             await utils.answer(message, self.strings["no_reply"])
@@ -79,7 +76,6 @@ class UploaderPro(loader.Module):
         return file
 
     async def _upload_to_service(self, file, service_url, field_name="file", extra_data=None):
-        """Загружает файл на указанный сервис."""
         try:
             data = extra_data or {}
             files = {field_name: file}
@@ -93,7 +89,6 @@ class UploaderPro(loader.Module):
             return None
 
     async def _parse_json_response(self, response_text):
-        """Парсит JSON-ответ и извлекает ссылку."""
         try:
             data = json.loads(response_text)
             if isinstance(data, dict):
