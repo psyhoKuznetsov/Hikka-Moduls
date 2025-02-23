@@ -1,4 +1,4 @@
-__version__ = (1, 0, 0)
+__version__ = (1, 1, 1)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
