@@ -1,3 +1,6 @@
+__version__ = (1, 0, 1)
+# meta developer: @psyho_Kuznetsov
+
 import logging
 from datetime import datetime
 from telethon.tl.types import Message
