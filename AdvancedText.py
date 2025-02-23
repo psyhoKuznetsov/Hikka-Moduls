@@ -99,6 +99,5 @@ class AdvancedTextModule(loader.Module):
 
     @loader.watcher(out=True)
     async def watcher(self, message: Message):
-        """Сразу редактируем сообщение в зависимости от активных опций."""
         if any([self.enabled_bold, self.enabled_italic, self.enabled_mono, self.enabled_underline, self.enabled_strikethrough, self.enabled_center]):
             await self.edit_text(message)
