@@ -8,11 +8,12 @@ import logging
 from io import BytesIO
 import random
 import json
+import aiohttp
 
 logger = logging.getLogger(__name__)
 
 @loader.tds
-class Uploader(loader.Module):
+class UploaderPro(loader.Module):
     """Универсальный модуль для загрузки файлов на различные сервисы."""
     strings = {
         "name": "UploaderPro",
@@ -22,11 +23,47 @@ class Uploader(loader.Module):
         "success": "✅ <b>Файл успешно загружен!</b>\n🔗 <b>Ссылка:</b> <code>{}</code>",
         "error": "❌ <b>Ошибка при загрузке:</b> <code>{}</code>",
         "file_too_big": "❌ <b>Файл слишком большой для загрузки.</b>",
+        "update_check": "🔄 <b>Проверка обновлений...</b>",
+        "update_available": "📢 <b>Доступно обновление!</b>\n 💫 Для обновления введите:\n<code>.dlm https://raw.githubusercontent.com/psyhoKuznetsov/Hikka-Models/refs/heads/main/UploaderPro.py</code>",
+        "no_update": "✅ <b>У вас установлена актуальная версия!</b>",
     }
 
     async def client_ready(self, client, db):
         self._client = client
         self._db = db
+
+    async def _get_latest_version(self):
+        """Получает последнюю версию с GitHub."""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get('https://raw.githubusercontent.com/psyhoKuznetsov/Hikka-Models/refs/heads/main/UploaderPro.py') as response:
+                    if response.status == 200:
+                        content = await response.text()
+                        for line in content.split('\n'):
+                            if line.startswith('__version__'):
+                                return eval(line.split('=')[1].strip())
+        except:
+            return None
+        return None
+
+    @loader.unrestricted
+    async def updateprocmd(self, message: Message):
+        """Проверить обновления модуля."""
+        await utils.answer(message, self.strings["update_check"])
+        
+        current_version = __version__
+        latest_version = await self._get_latest_version()
+        
+        if latest_version and latest_version > current_version:
+            await utils.answer(
+                message,
+                self.strings["update_available"].format(
+                    '.'.join(map(str, current_version)),
+                    '.'.join(map(str, latest_version))
+                )
+            )
+        else:
+            await utils.answer(message, self.strings["no_update"])
 
     async def _get_file(self, message: Message):
         """Получает файл из сообщения."""
@@ -59,13 +96,15 @@ class Uploader(loader.Module):
         """Парсит JSON-ответ и извлекает ссылку."""
         try:
             data = json.loads(response_text)
-            if isinstance(data, dict) and data.get("success", False):
-                if "files" in data and isinstance(data["files"], list):
+            if isinstance(data, dict):
+                if data.get("status") == "success" and "data" in data:
+                    return data["data"].get("url")
+                elif "files" in data and isinstance(data["files"], list):
                     return data["files"][0].get("url")
-            elif "url" in data:
-                return data["url"]
+                elif "url" in data:
+                    return data["url"]
         except json.JSONDecodeError:
-            return response_text  # Если ответ не JSON, возвращаем как есть
+            return response_text
         return None
 
     @loader.unrestricted
@@ -149,13 +188,22 @@ class Uploader(loader.Module):
             return
 
         await utils.answer(message, self.strings["uploading"])
-        link = await self._upload_to_service(
+        response_text = await self._upload_to_service(
             file,
             "https://tmpfiles.org/api/v1/upload",
             field_name="file"
         )
-        if link:
-            await utils.answer(message, self.strings["success"].format(link))
+        
+        if response_text:
+            try:
+                data = json.loads(response_text)
+                if data.get("status") == "success" and "data" in data:
+                    link = data["data"]["url"]
+                    await utils.answer(message, self.strings["success"].format(link))
+                else:
+                    await utils.answer(message, self.strings["error"].format("Неверный формат ответа"))
+            except json.JSONDecodeError:
+                await utils.answer(message, self.strings["error"].format("Ошибка парсинга JSON"))
         else:
             await utils.answer(message, self.strings["error"].format("Ошибка сервера"))
 
