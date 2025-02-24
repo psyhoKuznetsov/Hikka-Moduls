@@ -1,3 +1,6 @@
+__version__ = (1, 0, 0)
+# meta developer: @psyho_Kuznetsov
+
 import logging
 import asyncio
 from hikkatl.types import Message
