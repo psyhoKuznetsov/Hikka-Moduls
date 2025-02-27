@@ -1,4 +1,4 @@
-__version__ = (2, 0, 1)
+__version__ = (2, 0, 2)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
@@ -186,7 +186,6 @@ class Mporn(loader.Module):
                         self.used_media[channel].add(selected_msg.id)
                         
                         if len(self.used_media[channel]) > self.config["размер_кэша"] * 2:
-
                             self.used_media[channel] = set(list(self.used_media[channel])[-self.config["размер_кэша"]:])
                             
                         return selected_msg
@@ -220,7 +219,6 @@ class Mporn(loader.Module):
                                     break
                         
                         if not messages:
-                           
                             old_used = self.used_media[channel]
                             self.used_media[channel] = set()
                             
@@ -246,7 +244,7 @@ class Mporn(loader.Module):
                         
                         self.channel_cache[channel] = messages
                         
-                       
+                    
                         selected_msg = random.choice(messages)
                         self.used_media[channel].add(selected_msg.id)
                         return selected_msg
