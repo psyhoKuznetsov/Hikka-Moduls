@@ -1,4 +1,4 @@
-__version__ = (2, 0, 2)
+__version__ = (2, 1, 0)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
@@ -51,6 +51,7 @@ class Mporn(loader.Module):
         all_channels = []  
         for channels in self.CHANNELS.values():  
             all_channels.extend(channels)  
+        # Fixed: Create a list of unique channels instead of trying to append to a set
         self.CHANNELS["рандом"] = list(set(all_channels)) 
         
         for category in self.CHANNELS:
@@ -149,6 +150,7 @@ class Mporn(loader.Module):
                     if messages:
                         self.channel_cache[channel].extend(messages)
                        
+                        
                         seen_ids = set()
                         unique_messages = []
                         for msg in self.channel_cache[channel]:
@@ -156,9 +158,8 @@ class Mporn(loader.Module):
                                 seen_ids.add(msg.id)
                                 unique_messages.append(msg)
                         
-
+                    
                         unique_messages.sort(key=lambda msg: msg.id, reverse=True)
-                        
                         self.channel_cache[channel] = unique_messages[:self.config["размер_кэша"]]
                         
                 except Exception as e:
@@ -222,7 +223,7 @@ class Mporn(loader.Module):
                             old_used = self.used_media[channel]
                             self.used_media[channel] = set()
                             
-                            
+
                             async for msg in self._client.iter_messages(
                                 channel,
                                 limit=30,
@@ -234,14 +235,13 @@ class Mporn(loader.Module):
                                         break
                             
                             if not messages:
-                                
                                 self.used_media[channel] = old_used
                         
                         if not messages:
                             logging.warning(f"Не найдено медиа в канале {channel}.")
                             return None
                         
-                        
+                    
                         self.channel_cache[channel] = messages
                         
                     
