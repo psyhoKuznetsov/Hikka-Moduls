@@ -1,11 +1,11 @@
-__version__ = (1, 0, 0)
+__version__ = (1, 2, 0)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
 import random
 import asyncio
 import aiohttp
-from deep_translator import GoogleTranslator
+import json
 
 @loader.tds
 class Meme(loader.Module):
@@ -15,41 +15,67 @@ class Meme(loader.Module):
         "loading": "⌛",
         "error_load": "❌ <b>Не удалось загрузить мем!</b>",
         "error_send": "❌ <b>Не удалось отправить мем с {}!</b>",
-        "error_photo": "❌ <b>Ошибка загрузки изображения!</b>"
+        "error_photo": "❌ <b>Ошибка загрузки изображения!</b>",
+        "error_translate": "❌ <b>Не удалось перевести название мема!</b>"
     }
 
     def __init__(self):
         self.apis = [
             (self._get_imgflip_meme, "ImgFlip"),
-            (self._get_meme_api, "MemeAPI")
+            (self._get_meme_api, "MemeAPI"),
         ]
-        self._translator = None
         self._translation_cache = {}
+        self._url_cache = set()  
+        self._max_cache_size = 1000  
 
     async def client_ready(self, client, db):
         self._db = db
         self._client = client
-        if not self._translator:
-            self._translator = GoogleTranslator(source='en', target='ru')
 
     async def _translate_text(self, text):
         if not text:
             return ""
-           
+        
         if text in self._translation_cache:
             return self._translation_cache[text]
-            
-        try:
-            translated = self._translator.translate(text)
-            if translated:
-                self._translation_cache[text] = translated
-                return translated
-        except Exception:
-            pass
-        
-        return text 
 
-    @loader.command(ru_doc="случайный мем")
+        url = "https://translate.googleapis.com/translate_a/single"
+        
+        params = {
+            "client": "gtx",
+            "sl": "en",
+            "tl": "ru",
+            "dt": "t",
+            "q": text
+        }
+        
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, params=params, timeout=10) as response:
+                        if response.status != 200:
+                            await asyncio.sleep(1)
+                            continue
+                            
+                        data = await response.json()
+                        
+                       
+                        translated_text = ""
+                        for sentence in data[0]:
+                            if sentence[0]:
+                                translated_text += sentence[0]
+                        
+                        if translated_text:
+                            self._translation_cache[text] = translated_text
+                            return translated_text
+            except Exception as e:
+                await asyncio.sleep(1)
+                continue
+        
+        return text
+
+    @loader.command(ru_doc="Получить случайный мем")
     async def meme(self, message):
         args = utils.get_args_raw(message)
         
@@ -81,12 +107,15 @@ class Meme(loader.Module):
 
         meme_url, meme_name = meme_data
 
-        meme_title = await self._translate_text(meme_name)
-        caption = f"<b>{meme_title}</b>"
-
+        try:
+            meme_title = await self._translate_text(meme_name)
+            caption = f"<pre>{meme_title}</pre>"
+        except Exception:
+            caption = f"<pre>{meme_name}</pre>"
+        
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(meme_url, timeout=10) as resp:
+                async with session.get(meme_url, timeout=15) as resp:
                     if resp.status != 200:
                         await utils.answer(message, self.strings["error_photo"])
                         return
@@ -115,7 +144,7 @@ class Meme(loader.Module):
                 if not memes:
                     return None
                 random_meme = random.choice(memes)
-                return random_meme.get("url"), random_meme.get("name", "Unnamed Meme")
+                return random_meme.get("url"), random_meme.get("name", "Безымянный мем")
 
     async def _get_meme_api(self):
         async with aiohttp.ClientSession() as session:
@@ -123,4 +152,7 @@ class Meme(loader.Module):
                 if response.status != 200:
                     return None
                 data = await response.json()
-                return data.get("url"), data.get("title", "Unnamed Meme")
+                return data.get("url"), data.get("title", "Безымянный мем")
+                
+
+            return None
