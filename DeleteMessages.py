@@ -1,8 +1,6 @@
-__version__ = (1, 0, 1)
+__version__ = (1, 0, 2)
 # meta developer: @psyho_Kuznetsov
 
-import logging
-from datetime import datetime
 from telethon.tl.types import Message
 from .. import loader, utils
 
@@ -14,8 +12,7 @@ class DeleteChatMessagesModule(loader.Module):
         "name": "DeleteMessages",  
         "description": "Модуль для удаления всех ваших сообщений в указанном чате.",  
         "deleting": "<b>🗑 Удаление сообщений...</b>",  
-        "deleted": "<b>✅ Удаление завершено!</b>",  
-        "error": "<b>❌ Ошибка при удалении:</b> {}"  
+        "deleted": "<b>✅ Удаление завершено!</b>"
     }  
 
     async def client_ready(self, client, db):  
@@ -37,25 +34,18 @@ class DeleteChatMessagesModule(loader.Module):
             except ValueError:  
                 await message.edit("<b>❌ Неверный формат ID чата!</b>")  
                 return  
+                
+        status_msg = await message.edit(self.strings["deleting"])  
+          
+        async for msg in self._client.iter_messages(  
+            chat_id,  
+            from_user=self._me.id,  
+            reverse=True  
+        ):  
+            try:  
+                await msg.delete()  
+            except Exception:  
+                continue  
 
-        try:  
-            status_msg = await message.edit(self.strings["deleting"])  
-              
-            async for msg in self._client.iter_messages(  
-                chat_id,  
-                from_user=self._me.id,  
-                reverse=True  
-            ):  
-                try:  
-                    await msg.delete()  
-                except Exception as e:  
-                    logging.error(f"Ошибка при удалении сообщения {msg.id}: {str(e)}")  
-                    continue  
-
-            await status_msg.edit(self.strings["deleted"])  
-            await status_msg.delete()  
-
-        except Exception as e:  
-            error_text = self.strings["error"].format(str(e))  
-            await message.edit(error_text)  
-            logging.exception(error_text)
+        await status_msg.edit(self.strings["deleted"])  
+        await status_msg.delete()
