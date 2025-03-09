@@ -13,7 +13,7 @@ class StickSpam(loader.Module):
         "name": "StickSpam",
         "spam_started": "✈️ <b>Спам стикерами начат!</b>\n🆔 <code>{}</code>",
         "spam_stopped": "🛑 <b>Спам был принудительно остановлен!</b>",
-        "invalid_count": "⚠️ <b>Количество должно быть от 1 до 1000!</b>",
+        "invalid_count": "⚠️ <b>Количество должно быть от 1 до 10000!</b>",
         "invalid_interval": "⚠️ <b>Интервал должен быть больше 0!</b>",
         "sticker_id": "🆔 <b>ID стикера:</b> <code>{}</code>",
         "help": "📌 <b>Использование:</b> <code>.stickspam <ID_стикера> <количество> <интервал></code>",
@@ -36,7 +36,7 @@ class StickSpam(loader.Module):
         try:
             sticker_id, count, interval = args[0], int(args[1]), float(args[2])
 
-            if not 1 <= count <= 1000:
+            if not 1 <= count <= 10000:
                 return await utils.answer(message, self.strings["invalid_count"])
 
             if interval <= 0:
