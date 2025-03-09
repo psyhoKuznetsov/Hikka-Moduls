@@ -1,6 +1,5 @@
-__version__ = (1, 0, 1)
+__version__ = (1, 0, 0)
 # meta developer: @psyho_Kuznetsov
-
 
 from .. import loader, utils
 import random
