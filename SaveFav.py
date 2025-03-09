@@ -5,13 +5,13 @@ from .. import loader, utils
 from telethon import types
 
 @loader.tds
-class SimpleFavMod(loader.Module):
+class Faver(loader.Module):
     """Сохраняет сообщения, видео, файлы и т.д в избранное"""    
     strings = {"name": "SaveFav"}
 
     @loader.command()
     async def fav(self, message):
-        """Сохраняет в избранное. Использование: .fav"""
+        """Сохраняет в избранное"""
         if not message.is_reply:
             return await message.edit("<b>❌ Ответьте на сообщение.</b>", parse_mode="html")            
         reply = await message.get_reply_message()
