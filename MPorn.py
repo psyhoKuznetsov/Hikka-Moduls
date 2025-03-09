@@ -1,10 +1,9 @@
-__version__ = (2, 0, 1)
+__version__ = (2, 0, 2)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
 import random
 import asyncio
-import logging
 from telethon.tl.types import Message, InputMessagesFilterVideo, InputMessagesFilterPhotos
 from telethon.errors import ChannelPrivateError, MessageDeleteForbiddenError
 
@@ -164,8 +163,6 @@ class Mporn(loader.Module):
         
         if self.config["auto_preload"]:
             asyncio.create_task(self._background_preload())
-        
-        logging.info("Ай шалунишка зачем скачал модуль?")
 
     async def _background_preload(self):
         retry_count = 0
@@ -201,8 +198,8 @@ class Mporn(loader.Module):
                         for task in done:
                             try:
                                 await task
-                            except Exception as e:
-                                logging.error(f"Preload error for {channel}: {str(e)}")
+                            except Exception:
+                                pass
                     
                     task = asyncio.create_task(self._prefetch_media(channel, is_photo))
                     active_tasks.append(task)
@@ -212,14 +209,9 @@ class Mporn(loader.Module):
                 
                 retry_count = 0
                 await asyncio.sleep(1800) 
-            except Exception as e:
-                error_msg = f"Background preload error: {str(e)}"
-                if error_msg != self._last_error:
-                    logging.error(error_msg)
-                    self._last_error = error_msg
+            except Exception:
                 retry_count += 1
                 if retry_count >= max_retries:
-                    logging.error("Max retries reached. Pausing for 1 hour.")
                     await asyncio.sleep(3600)
                     retry_count = 0
                 else:
@@ -238,7 +230,6 @@ class Mporn(loader.Module):
                 try:
                     messages = await self._client.get_messages(channel, limit=self.config["cache_size"], filter=media_filter)
                     if not messages or not messages.total:
-                        logging.warning(f"Channel {channel} is empty or unavailable.")
                         self.blacklisted_channels.add(channel)
                         return
                     
@@ -252,11 +243,10 @@ class Mporn(loader.Module):
                     self.channel_cache[channel] = unique_messages[:self.config["cache_size"]]
                 except ChannelPrivateError:
                     self.blacklisted_channels.add(channel)
-                    logging.info(f"Channel {channel} added to blacklist (private or unavailable).")
-                except Exception as e:
-                    logging.error(f"Error preloading media from {channel}: {str(e)}")
-        except Exception as e:
-            logging.error(f"Lock error for {channel}: {str(e)}")
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
     async def _get_random_media_from_channel(self, channel, is_photo=False, loading_msg=None):
         if channel in self.blacklisted_channels:
@@ -280,7 +270,6 @@ class Mporn(loader.Module):
                 messages = await self._client.get_messages(channel, limit=50, filter=media_filter)
                 
                 if not messages or not messages.total:
-                    logging.warning(f"Channel {channel} is empty or unavailable.")
                     self.blacklisted_channels.add(channel)
                     return None
                 
@@ -291,7 +280,6 @@ class Mporn(loader.Module):
                     available_messages = [msg for msg in messages if msg.media]
                 
                 if not available_messages:
-                    logging.warning(f"No media available in {channel}.")
                     self.blacklisted_channels.add(channel)
                     return None
                 
@@ -299,8 +287,7 @@ class Mporn(loader.Module):
                 self.used_media[channel].add(selected_msg.id)
                 self.channel_cache[channel] = available_messages[:self.config["cache_size"]]
                 return selected_msg
-        except Exception as e:
-            logging.error(f"Error fetching media from {channel}: {str(e)}")
+        except Exception:
             return None
         finally:
             if progress_task:
@@ -321,19 +308,17 @@ class Mporn(loader.Module):
                 await asyncio.sleep(self.config["progress_update_interval"])
         except asyncio.CancelledError:
             pass
-        except Exception as e:
-            logging.error(f"Progress update error: {str(e)}")
+        except Exception:
+            pass
 
     async def send_random_media(self, message: Message, category: str, is_photo=False):
         if self.config["delete_command"]:
             try:
-                logging.debug(f"Attempting to delete command message {message.id} in chat {message.chat_id}")
                 await self._client.delete_messages(message.chat_id, [message.id])
-                logging.debug(f"Command message {message.id} deleted successfully")
             except MessageDeleteForbiddenError:
-                logging.warning(f"Cannot delete message {message.id}: No permission in chat {message.chat_id}")
-            except Exception as e:
-                logging.error(f"Failed to delete command message {message.id}: {str(e)}")
+                pass
+            except Exception:
+                pass
         
         if category not in self.CHANNELS:
             await message.respond(self.strings["error_category"])
@@ -359,9 +344,9 @@ class Mporn(loader.Module):
                     media_found = True
                     break
             except asyncio.TimeoutError:
-                logging.warning(f"Timeout fetching from {channel}")
-            except Exception as e:
-                logging.error(f"Error fetching media from {channel}: {str(e)}")
+                pass
+            except Exception:
+                pass
         
         try:
             await loading_msg.delete()
