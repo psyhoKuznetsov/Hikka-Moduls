@@ -5,8 +5,8 @@ from .. import loader, utils
 from telethon import types
 import datetime
 
-class ДатаЗачатияMod(loader.Module):
-    """Определяет примерную дату зачатия по дате рождения"""
+class ConceptionDate(loader.Module):
+    """Определяет примерную дату зачатия по дате рождения. Используйте: .зачали [год] [месяц] [день]"""
     
     strings = {
         "name": "ConceptionDate",
@@ -17,6 +17,7 @@ class ДатаЗачатияMod(loader.Module):
     }
     
     async def зачалиcmd(self, message: types.Message):
+        """Рассчитывает примерную дату зачатия по дате рождения."""
         args = utils.get_args(message)
         if len(args) != 3:
             return await utils.answer(message, self.strings["no_args"])
