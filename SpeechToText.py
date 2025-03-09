@@ -3,30 +3,15 @@ __version__ = (1, 1, 0)
 
 from .. import loader, utils
 import asyncio
-import logging
 import os
 import tempfile
 import speech_recognition as sr
-import subprocess
-
-logger = logging.getLogger(__name__)
 
 @loader.tds
 class SpeechToText(loader.Module):
-    """Speech to text conversion via Google Speech Recognition (supports multiple languages)"""
+    """Модуль для гс или кружек в текст"""
 
     strings = {
-        "name": "SpeechToText",
-        "processing": "🔮 <b>Processing...</b>",
-        "no_reply": "🚫 <b>Reply to a voice or video message!</b>",
-        "result": "📜 <b>Result:</b>\n\n{}",
-        "error": "❌ <b>Error processing the message.</b>",
-        "downloading": "⏳ <b>Downloading file...</b>",
-        "converting": "🔄 <b>Converting audio...</b>",
-        "recognizing": "🎯 <b>Recognizing speech...</b>"
-    }
-    
-    strings_ru = {
         "name": "SpeechToText",
         "processing": "🔮 <b>Обработка...</b>",
         "no_reply": "🚫 <b>Ответьте на голосовое или видеосообщение!</b>",
@@ -34,16 +19,25 @@ class SpeechToText(loader.Module):
         "error": "❌ <b>Ошибка при обработке сообщения.</b>",
         "downloading": "⏳ <b>Скачивание файла...</b>",
         "converting": "🔄 <b>Конвертация аудио...</b>",
-        "recognizing": "🎯 <b>Распознавание речи...</b>"
+        "recognizing": "🎯 <b>Распознавание речи...</b>",
+        "current_lang": "🌐 <b>Текущий язык:</b> <code>{}</code>",
+        "lang_set": "🌐 <b>Язык распознавания изменен на:</b> <code>{}</code>",
+        "lang_help": (
+            "🌐 <b>Доступные языки:</b>\n"
+            "en-US (английский), ru-RU (русский), fr-FR (французский),\n"
+            "de-DE (немецкий), zh-CN (китайский), ja-JP (японский),\n"
+            "es-ES (испанский)\n\n"
+            "Используйте: <code>.stxtcfg [код языка]</code>"
+        )
     }
-    
+
     def __init__(self):
         self.name = self.strings["name"]
         self.recognizer = sr.Recognizer()
         self.config = loader.ModuleConfig(
-            "language", "ru-RU", "Default language for speech recognition"
+            "language", "ru-RU", "Язык по умолчанию для распознавания речи"
         )
-    
+
     async def convert_to_wav(self, input_file, output_file):
         try:
             cmd = [
@@ -58,17 +52,15 @@ class SpeechToText(loader.Module):
             )
             await process.communicate()
             return True
-        except Exception as e:
-            logger.error(f"Audio conversion error: {e}", exc_info=True)
+        except Exception:
             return False
-    
+
     async def recognize_audio(self, file_path, language):
         try:
             return await asyncio.to_thread(self._perform_recognition, file_path, language)
-        except Exception as e:
-            logger.error(f"Recognition error: {e}", exc_info=True)
+        except Exception:
             return None
-    
+
     def _perform_recognition(self, file_path, language):
         with sr.AudioFile(file_path) as source:
             audio_data = self.recognizer.record(source)
@@ -76,7 +68,7 @@ class SpeechToText(loader.Module):
 
     @loader.command()
     async def atxt(self, message):
-        """Usage: Reply to a voice message with .atxt [language code]"""
+        """Использование: Ответьте на голосовое сообщение с .atxt [код языка]"""
         args = utils.get_args_raw(message)
         language = args.strip() if args else self.config["language"]
         
@@ -106,26 +98,24 @@ class SpeechToText(loader.Module):
             else:
                 await utils.answer(msg, self.strings["error"])
                 
-        except Exception as e:
-            logger.error(f"Error in atxt: {e}", exc_info=True)
+        except Exception:
             await utils.answer(msg, self.strings["error"])
         finally:
             for temp_file in [temp_original, temp_wav]:
                 if os.path.exists(temp_file):
                     os.unlink(temp_file)
-    
+
     @loader.command()
     async def stxtcfg(self, message):
-        """Configure default language: .stxtcfg [language code]"""
+        """Настройка языка распознавания: .stxtcfg [код языка]"""
         args = utils.get_args_raw(message)
         if not args:
             return await utils.answer(
-                message, f"Current default language: <code>{self.config['language']}</code>\n"
-                "To change, use: <code>.stxtcfg [language code]</code>\n"
-                "Example language codes: en-US, ru-RU, fr-FR, de-DE, zh-CN, ja-JP, es-ES"
+                message, 
+                self.strings["current_lang"].format(self.config["language"]) + "\n\n" + self.strings["lang_help"]
             )
         
         self.config["language"] = args.strip()
         await utils.answer(
-            message, f"Default language set to: <code>{self.config['language']}</code>"
-      )
+            message, self.strings["lang_set"].format(self.config["language"])
+        )
