@@ -1,12 +1,9 @@
-__version__ = (1, 0, 1)
+__version__ = (1, 0, 2)
 # meta developer: @psyho_Kuznetsov
 
 from .. import loader, utils
 from telethon import types
 import asyncio
-import logging
-
-logger = logging.getLogger(__name__)
 
 @loader.tds
 class HeartAnimationMod(loader.Module):
@@ -62,7 +59,6 @@ class HeartAnimationMod(loader.Module):
             await msg.delete()
 
         except Exception as e:
-            logger.exception(e)
             await utils.answer(message, self.strings['error'].format(str(e)))
 
     @loader.command(ru_doc="Печатает текст с эффектом появления")
@@ -90,5 +86,4 @@ class HeartAnimationMod(loader.Module):
             await msg.edit(text)
 
         except Exception as e:
-            logger.exception(e)
             await utils.answer(message, self.strings['error'].format(str(e)))
