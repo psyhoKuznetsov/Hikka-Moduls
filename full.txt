@@ -1,7 +1,7 @@
 AdvancedText
 Animation
-ConceptionDate
-GetID.py
+ConceptionData
+GetID
 GithubhostBot
 MPorn
 MemeAPI
