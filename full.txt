@@ -13,3 +13,7 @@ Spammer
 SpeechToText
 StickSpam
 banall
+Prints
+NetStatus
+MentionChat
+time
