@@ -1,8 +1,10 @@
 __version__ = (1, 0, 1)
+# meta developer: @psyhomodules
 
 import aiohttp
 from hikkatl.types import Message
 from .. import loader, utils
+from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class ScriptSearch(loader.Module):
@@ -22,6 +24,15 @@ class ScriptSearch(loader.Module):
             "MAX_RESULTS", 5,
         )
 
+    async def client_ready(self, client, db):
+        self.client = client
+        self.db = db
+        try:
+            await client(JoinChannelRequest("@psyhomodules"))
+        except:
+            pass
+            
+    
     async def format_script_info(self, script: dict) -> str:
         title = script.get("title", "Без названия")
         game = script.get("game", {}).get("name", "Неизвестная игра")
