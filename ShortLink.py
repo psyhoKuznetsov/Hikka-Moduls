@@ -6,7 +6,6 @@ import aiohttp
 import asyncio
 import urllib.parse
 import re
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class ShortLinkMod(loader.Module):
@@ -22,11 +21,6 @@ class ShortLinkMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
 
     async def shorten_tinyurl(self, url):
         try:
