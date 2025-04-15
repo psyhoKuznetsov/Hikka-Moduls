@@ -1,11 +1,12 @@
-# meta developer: @psyho_Kuznetsov
+__version__ = (1, 0, 0)
+# meta developer: @psyhomodules
+
 import os
 import json
 from asyncio import sleep
 from telethon import functions, types
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateEmojiStatusRequest
 from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.errors import FileReferenceExpiredError, FileIdInvalidError
 from .. import loader, utils
 
@@ -30,11 +31,6 @@ class CuMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
 
     async def cucmd(self, message):
         """.cu <s> <reply/@username>
