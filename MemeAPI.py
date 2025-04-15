@@ -2,7 +2,6 @@ __version__ = (1, 2, 0)
 # meta developer: @psyhomodules
 
 from .. import loader, utils
-from telethon.tl.functions.channels import JoinChannelRequest
 import random
 import asyncio
 import aiohttp
@@ -32,11 +31,7 @@ class Meme(loader.Module):
      async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
+         
     async def _translate_text(self, text):
         if not text:
             return ""
