@@ -3,7 +3,6 @@ __version__ = (1, 0, 1)
 
 from .. import loader, utils
 from telethon import types
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class SimpleFavMod(loader.Module):
@@ -13,10 +12,6 @@ class SimpleFavMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.command()
     async def fav(self, message):
