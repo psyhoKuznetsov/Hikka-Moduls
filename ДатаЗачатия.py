@@ -4,7 +4,6 @@ __version__ = (1, 0, 0)
 
 from .. import loader, utils
 from telethon import types
-from telethon.tl.functions.channels import JoinChannelRequest
 import datetime
 import re
 import logging
@@ -27,11 +26,7 @@ class ДатаЗачатияMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-    
+        
     def validate_date(self, year, month, day):
         try:
             date = datetime.date(year, month, day)
