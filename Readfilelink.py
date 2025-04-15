@@ -6,7 +6,6 @@ import aiohttp
 import time
 from datetime import datetime
 from telethon.tl.types import Message
-from telethon.tl.functions.channels import JoinChannelRequest
 from .. import loader, utils
 from urllib.parse import urlparse
 
@@ -43,10 +42,6 @@ class ReadFilelinkMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
 
     async def rfcmd(self, message: Message):
