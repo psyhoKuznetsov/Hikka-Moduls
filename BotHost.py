@@ -8,7 +8,6 @@ import logging
 import os
 import sys
 from typing import Optional
-from telethon.tl.functions.channels import JoinChannelRequest
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +38,6 @@ class BotHostMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.command(ru_doc="Запускает бота (ответом на файл)")
     async def boton(self, message: Message):
