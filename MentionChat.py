@@ -7,7 +7,6 @@ import asyncio
 import random
 from telethon.errors import FloodWaitError
 from telethon import functions, types
-from telethon.tl.functions.channels import JoinChannelRequest
 import logging
 
 @loader.tds
@@ -28,10 +27,6 @@ class MentionInAllChatsMod(loader.Module):
         self.client = client
         self.db = db
         self.emojis = ["✅", "🔥", "💥", "⚡", "💫", "🌟", "💯", "🔆", "💪", "👍", "🎯", "🚀", "⭐", "💢", "💦", "💣"]
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
 
     async def get_common_chats(self, user_id):
