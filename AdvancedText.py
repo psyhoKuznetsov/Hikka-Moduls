@@ -3,7 +3,6 @@ __version__ = (1, 1, 0)
 
 from hikkatl.types import Message
 from .. import loader, utils
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class AdvancedTextModule(loader.Module):
@@ -20,10 +19,6 @@ class AdvancedTextModule(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     async def edit_text(self, message: Message):
         text = message.text
