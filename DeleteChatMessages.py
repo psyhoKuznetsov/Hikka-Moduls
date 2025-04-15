@@ -6,7 +6,6 @@ from datetime import datetime
 from typing import Optional
 from telethon.tl.types import Message, PeerChannel
 from telethon.errors import ChatIdInvalidError
-from telethon.tl.functions.channels import JoinChannelRequest
 from .. import loader, utils
 import asyncio
 
@@ -34,11 +33,7 @@ class DeleteChatMessagesModule(loader.Module):
         self.client = client
         self.db = db
         seif._me = await client.get_me()
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
+        
     async def _delete_batch(self, chat, messages: list) -> int:
         """Удаление сообщений пакетами"""
         try:
