@@ -1,11 +1,10 @@
 __version__ = (1, 0, 0)
-# meta developer: @psyho_Kuznetsov
+# meta developer: @psyhomodules
 
 import random
 from telethon.tl.types import Message
 from telethon.errors import ChannelInvalidError, ChannelPrivateError
 from .. import loader, utils
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class RandomStory(loader.Module):
@@ -18,11 +17,6 @@ class RandomStory(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
 
     @loader.command()
     async def история(self, message: Message):
