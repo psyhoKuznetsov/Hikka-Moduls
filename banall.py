@@ -17,7 +17,6 @@ from hikkatl.tl.types import (
 )
 from hikkatl.errors import FloodWaitError
 from .. import loader, utils
-from telethon.tl.functions.channels import JoinChannelRequest
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +43,6 @@ class BanAllModule(loader.Module):
      async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.owner
     async def banallcmd(self, message: Message):
