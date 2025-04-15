@@ -3,7 +3,6 @@ __version__ = (1, 0, 1)
 
 from .. import loader, utils
 from telethon import types
-from telethon.tl.functions.channels import JoinChannelRequest
 import asyncio
 import logging
 
@@ -28,10 +27,6 @@ class HeartAnimationMod(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.command(ru_doc="Создает анимированное сердце")
     async def h(self, message: types.Message):
