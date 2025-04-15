@@ -1,10 +1,12 @@
+__version__ = (1, 0, 0)
+# meta developer: @psyhomodules
+
 import asyncio
 import os
 import subprocess
 from datetime import datetime
 from .. import loader, utils
 from hikkatl.types import Message
-from telethon.tl.functions.channels import JoinChannelRequest
 
 
 @loader.tds
@@ -45,10 +47,6 @@ class GithubhostBot(loader.Module):
         for dir_path in [seif.base_dir, self.logs_dir]:
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     def _get_repo_dir(self):
         if not self.config["repo_url"]:
