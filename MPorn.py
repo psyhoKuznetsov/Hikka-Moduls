@@ -6,7 +6,6 @@ import random
 import asyncio
 import logging
 from telethon.tl.types import Message, InputMessagesFilterVideo, InputMessagesFilterPhotos
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class Mporn(loader.Module):
@@ -37,7 +36,7 @@ class Mporn(loader.Module):
             "timeout", 5,
             "delete_command", True,
             "show_progress", True,
-            "max_video_duration", 300,  # Максимальная длительность видео в секундах (5 минут)
+            "max_video_duration", 300, 
         )  
         self.channel_cache = {}
         self.used_media_ids = {}
@@ -59,12 +58,6 @@ class Mporn(loader.Module):
         
         asyncio.create_task(self._background_preload())
         logging.info("MPorn модуль загружен")
-
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-        
 
 
     async def _background_preload(self):
