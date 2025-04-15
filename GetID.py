@@ -8,7 +8,6 @@ from hikkatl.tl.functions.channels import GetFullChannelRequest
 from hikkatl.tl.functions.messages import GetFullChatRequest
 from hikkatl.tl.functions.contacts import ResolveUsernameRequest
 from hikka import loader  
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class GetID(loader.Module):
@@ -30,10 +29,6 @@ class GetID(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     async def getidcmd(self, message: Message):
         """Узнать ID пользователя, чата или канала."""
