@@ -6,7 +6,6 @@ import asyncio
 from hikkatl.types import Message
 from hikkatl.errors import FloodWaitError
 from .. import loader, utils
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class TotalPurge(loader.Module):
@@ -16,11 +15,7 @@ class TotalPurge(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
+        
     @loader.unrestricted
     async def purgecmd(self, message: Message):
         """Удалить ВСЕ сообщения в текущем чате также работает и в каналах просто напиши ету команду"""
