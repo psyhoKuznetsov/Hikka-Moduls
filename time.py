@@ -6,7 +6,6 @@ import aiohttp
 import pytz
 from .. import loader, utils
 from telethon.tl.types import Message
-from telethon.tl.functions.channels import JoinChannelRequest
 
 class Time(loader.Module):
     """Узнать точное время страны/города"""
@@ -24,10 +23,6 @@ class Time(loader.Module):
         self.client = client
         self.db = db
         self.location_cache = {}
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.command("time", args="[город/страна]")
     async def time(self, message: Message):
