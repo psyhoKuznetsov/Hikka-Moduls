@@ -4,7 +4,6 @@ __version__ = (1, 0, 0)
 from .. import loader, utils
 import telethon
 from telethon.tl.types import Message
-from telethon.tl.functions.channels import JoinChannelRequest
 import re
 import asyncio
 
@@ -32,11 +31,6 @@ class BFGPromoMonitorMod(loader.Module):
         self.client = client
         self.db = db
         self.is_monitoring = self.db.get("BFGPromoMonitor", "status", False)
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
 
     @loader.command()
     async def promocmd(self, message):
