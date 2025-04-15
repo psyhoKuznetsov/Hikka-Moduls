@@ -2,7 +2,6 @@ __version__ = (1, 0, 0)
 # meta developer: @psyhomodules
 
 from hikkatl.types import Message
-from telethon.tl.functions.channels import JoinChannelRequest
 from .. import loader, utils
 import asyncio
 
@@ -27,11 +26,6 @@ class StickSpam(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
-
 
     @loader.command(ru_doc="🚀 Начать спам стикерами")
     async def stickspam(self, message: Message):
