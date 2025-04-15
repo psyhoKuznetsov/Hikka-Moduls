@@ -4,7 +4,6 @@ __version__ = (1, 0, 0)
 from .. import loader, utils
 from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
 from telethon.tl.types import InputPhoto
-from telethon.tl.functions.channels import JoinChannelRequest
 import io
 import requests
 
@@ -27,10 +26,6 @@ class Avatar(loader.Module):
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
 
     @loader.command()
     async def avataradd(self, message):
