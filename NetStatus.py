@@ -4,7 +4,6 @@ __version__ = (1, 0, 1)
 from .. import loader, utils
 import asyncio
 from telethon import functions, types
-from telethon.tl.functions.channels import JoinChannelRequest
 
 @loader.tds
 class NetStatusM(loader.Module):
@@ -49,10 +48,6 @@ class NetStatusM(loader.Module):
     
     def set(self, key, value):
         self.db.set(self._db_name, key, value)
-        try:
-            await client(JoinChannelRequest("@psyhomodules"))
-        except:
-            pass
   
 
     async def netoncmd(self, message):
